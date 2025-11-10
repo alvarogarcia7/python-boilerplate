@@ -1,19 +1,12 @@
 include makefiles/docker-compose.mk
-include makefiles/virtualenvironment.mk
+include makefiles/uv.mk
 
-install: requirements install-githooks
-.PHONY: install
-
-install-githooks: check-virtual-env
-	pre-commit install
+install-githooks: check-uv
+	uv run pre-commit install
 .PHONY: install-githooks
 
-test: check-virtual-env typecheck test-python
+test: check-uv typecheck test-python ## Execute all tests
 .PHONY: test
 
-test-python: check-virtual-env
-	pytest .
-.PHONY: test-python
-
-pre-commit: test
+pre-commit: test ## Git hook for pre-commit
 .PHONY: pre-commit

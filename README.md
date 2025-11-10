@@ -2,11 +2,16 @@
 
 ## Getting started - Local python
 
+This project uses [uv](https://docs.astral.sh/uv/) for Python package and virtual environment management.
+
+To set up the project:
+
 ```bash
-make virtualenvironment
-source venv/bin/activate
-make virtualenvironment-finish
-make install
+# Install uv (if not already installed)
+# See https://docs.astral.sh/uv/getting-started/installation/
+
+# uv will automatically create a virtual environment and install dependencies
+uv sync
 make test
 ```
 
@@ -15,6 +20,6 @@ make test
 ```bash
 make up
 make bash
-# continue the steps for the local installation
+# development
 make down
 ```
