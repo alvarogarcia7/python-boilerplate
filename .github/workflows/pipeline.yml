@@ -34,6 +34,12 @@ jobs:
     - name: Verify makefile structure
       run: make verify-all
 
+    - name: Check code formatting
+      run: make format-check
+
+    - name: Run linter
+      run: make lint
+
     - name: Run tests
       run: make test
 
