@@ -72,20 +72,14 @@ verify-no-duplicates: verify-makefiles-readable ## Verify no duplicate targets
 
 # Test that all targets from modular makefiles are accessible
 verify-targets-accessible: verify-main-includes ## Verify targets are accessible from root
-	@echo "Testing uv targets..."; \
-	make -n install >/dev/null || exit 1; \
-	make -n install-dev >/dev/null || exit 1; \
-	make -n upgrade >/dev/null || exit 1; \
-	echo "✓ UV targets accessible"; \
-	echo "Testing docker targets..."; \
-	make -n up >/dev/null || exit 1; \
-	make -n down >/dev/null || exit 1; \
-	make -n bash >/dev/null || exit 1; \
-	echo "✓ Docker targets accessible"; \
-	echo "Testing python targets..."; \
-	make -n typecheck >/dev/null || exit 1; \
-	make -n test-python >/dev/null || exit 1; \
-	echo "✓ Python targets accessible"
+	@targets=$$(grep -h "^[a-zA-Z0-9_-]*:" $(MAKEFILES) | grep -v "^[A-Z_]*:=" | cut -d: -f1 | sort -u); \
+	for target in $$targets; do \
+		if ! make -n $$target >/dev/null 2>&1; then \
+			echo "ERROR: Target '$$target' not accessible from repository root"; \
+			exit 1; \
+		fi; \
+	done; \
+	echo "✓ All targets from modular makefiles are accessible"
 .PHONY: verify-targets-accessible
 
 # List all available targets with their help text
@@ -100,8 +94,5 @@ list-targets: ## List all available make targets
 
 # Run all verification checks
 verify-all: verify-makefiles-exist verify-makefiles-readable verify-main-includes verify-phony-declarations verify-no-duplicates verify-targets-accessible ## Run all makefile verification checks
-	@echo ""; \
-	echo "╔════════════════════════════════════════╗"; \
-	echo "║  All makefile verifications passed! ✓  ║"; \
-	echo "╚════════════════════════════════════════╝"
+	@echo "✓ All makefile verifications passed"
 .PHONY: verify-all
