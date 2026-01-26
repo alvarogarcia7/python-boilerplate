@@ -13,7 +13,8 @@ install-githooks: check-uv ## Install git hooks
 test: check-uv typecheck test-python ## Execute all tests
 .PHONY: test
 
-pre-commit: test ## Git hook for pre-commit
+pre-commit: ## Git hook for pre-commit
+	uv run pre-commit run --all-files
 .PHONY: pre-commit
 
 init: ## Initialize this project in this folder (or git worktree) after clone
