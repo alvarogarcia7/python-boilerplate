@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import sys
-from typing import List, Any, Tuple, cast
+from typing import List, Any, Tuple
 
 
 def main() -> None:
@@ -14,7 +14,7 @@ def main() -> None:
         sys.stdout.write(output + "\n")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 
 
@@ -34,7 +34,9 @@ class PlayerRepository:
         return self.names
 
     def find_by_name(self, name: str) -> Player:
-        player: Player = list(filter(lambda current: current.name == name, self.names))[0]
+        player: Player = list(filter(lambda current: current.name == name, self.names))[
+            0
+        ]
         assert player is not None
         return player
 
@@ -43,12 +45,12 @@ class UIRepresentation:
     def position(self, index_of_position: int) -> str:
         result = str(index_of_position)
         if not index_of_position:
-            result = 'Start'
+            result = "Start"
         return result
 
     @staticmethod
     def get_die_values(raw_values: List[str]) -> List[int]:
-        return list(map(lambda x: int(x.strip().replace(',', '')), raw_values))
+        return list(map(lambda x: int(x.strip().replace(",", "")), raw_values))
 
 
 class Game:
@@ -64,7 +66,7 @@ class Game:
         user_name = user_input_parts[-1]
         self.user_names.append(user_name)
         action = user_input_parts[0]
-        if action == 'move':
+        if action == "move":
             user_name = user_input_parts[1]
             die_values = self.ui_representation.get_die_values(user_input_parts[-2:])
             user = self.players.find_by_name(user_name)
@@ -83,12 +85,12 @@ class Game:
         current_position = self.ui_representation.position(player.position)
         user_name = player.name
         die_values_str = list(map(lambda x: str(x), die_values))
-        moving_message = f'{user_name} rolls {", ".join(die_values_str)}. {user_name} moves from {previous_position} to {current_position}'
+        moving_message = f"{user_name} rolls {', '.join(die_values_str)}. {user_name} moves from {previous_position} to {current_position}"
         if player.position == 63:
             moving_message += f". {user_name} wins!!"
         elif player.position > 63:
             current_position = self.ui_representation.position(63)
-            moving_message = f'{user_name} rolls {", ".join(die_values_str)}. {user_name} moves from {previous_position} to {current_position}'
+            moving_message = f"{user_name} rolls {', '.join(die_values_str)}. {user_name} moves from {previous_position} to {current_position}"
             player.move(2 * (63 - player.position))
             moving_message += f". {user_name} bounces! {user_name} returns to {self.ui_representation.position(player.position)}"
         return moving_message
