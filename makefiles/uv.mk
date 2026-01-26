@@ -7,7 +7,7 @@ check-uv:
 .PHONY: check-uv
 
 # Sync dependencies and create virtual environment
-sync: check-uv
+sync: check-uv ## Sync dependencies and create virtual environment
 	uv sync
 .PHONY: sync
 
@@ -22,12 +22,3 @@ install-dev: check-uv ## Install production and dev dependencies
 upgrade: check-uv ## Upgrade all dependencies
 	uv sync --upgrade
 .PHONY: upgrade
-
-typecheck: check-uv ## Typecheck with mypy
-	uv run mypy . --exclude .venv --strict --warn-unreachable --warn-return-any --disallow-untyped-calls
-.PHONY: typecheck
-
-# Run Python tests with pytest using uv run
-test-python: check-uv
-	uv run pytest .
-.PHONY: test-python
