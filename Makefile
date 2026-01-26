@@ -1,7 +1,10 @@
-include makefiles/docker-compose.mk
+# Include modular makefiles organized by responsibility
 include makefiles/uv.mk
+include makefiles/python.mk
+include makefiles/docker.mk
+include makefiles/bash-colors.mk
 
-install-githooks: check-uv
+install-githooks: check-uv ## Install git hooks
 	uv run pre-commit install
 .PHONY: install-githooks
 
