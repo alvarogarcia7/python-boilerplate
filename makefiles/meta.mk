@@ -2,7 +2,10 @@
 # of the build system itself
 
 MAKEFILES_DIR := makefiles
-MAKEFILES := $(MAKEFILES_DIR)/uv.mk $(MAKEFILES_DIR)/python.mk $(MAKEFILES_DIR)/docker.mk $(MAKEFILES_DIR)/bash-colors.mk
+# Dynamically discover all .mk files in makefiles directory (excluding meta.mk itself)
+MAKEFILES := $(filter-out $(MAKEFILES_DIR)/meta.mk, $(wildcard $(MAKEFILES_DIR)/*.mk))
+# Also include the top-level Makefile for verification
+ALL_MAKEFILES := Makefile $(MAKEFILES)
 
 # Check that all expected makefiles exist
 verify-makefiles-exist: ## Verify all expected makefiles exist
@@ -89,7 +92,7 @@ verify-targets-accessible: verify-main-includes ## Verify targets are accessible
 list-targets: ## List all available make targets
 	@echo "Available targets:"; \
 	echo ""; \
-	grep -h "##" Makefile $(MAKEFILES) 2>/dev/null | \
+	grep -h "##" $(ALL_MAKEFILES) 2>/dev/null | \
 		grep -E "^[a-zA-Z0-9_-]+:" | \
 		sed 's/:.*##\s*/:/' | \
 		sed 's/:/ /'
