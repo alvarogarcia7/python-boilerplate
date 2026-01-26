@@ -1,0 +1,104 @@
+# This Makefile provides meta targets for verifying the integrity and structure
+# of the build system itself
+
+MAKEFILES_DIR := makefiles
+MAKEFILES := $(MAKEFILES_DIR)/uv.mk $(MAKEFILES_DIR)/python.mk $(MAKEFILES_DIR)/docker.mk $(MAKEFILES_DIR)/bash-colors.mk
+
+# Check that all expected makefiles exist
+verify-makefiles-exist: ## Verify all expected makefiles exist
+	@for file in $(MAKEFILES); do \
+		if [ ! -f "$$file" ]; then \
+			echo "ERROR: Missing makefile: $$file"; \
+			exit 1; \
+		fi; \
+	done
+	@echo "✓ All expected makefiles exist"
+.PHONY: verify-makefiles-exist
+
+# Check that makefiles are readable and contain valid make syntax
+verify-makefiles-readable: verify-makefiles-exist ## Verify makefiles are readable
+	@for file in $(MAKEFILES); do \
+		if ! grep -q . "$$file" 2>/dev/null; then \
+			echo "ERROR: Cannot read makefile: $$file"; \
+			exit 1; \
+		fi; \
+	done
+	@echo "✓ All makefiles are readable"
+.PHONY: verify-makefiles-readable
+
+# Check that main Makefile includes all expected makefiles
+verify-main-includes: verify-makefiles-exist ## Verify main Makefile includes all modules
+	@for file in $(MAKEFILES); do \
+		if ! grep -q "include $$file" Makefile; then \
+			echo "ERROR: Main Makefile does not include: $$file"; \
+			exit 1; \
+		fi; \
+	done
+	@echo "✓ Main Makefile includes all modular makefiles"
+.PHONY: verify-main-includes
+
+# Check that all .PHONY declarations exist
+verify-phony-declarations: verify-makefiles-readable ## Verify .PHONY declarations
+	@for file in $(MAKEFILES); do \
+		if grep -q "^[a-zA-Z0-9_-]*:" "$$file"; then \
+			grep "^[a-zA-Z0-9_-]*:" "$$file" | cut -d: -f1 | while read target; do \
+				if ! grep -q "\.PHONY: .*$$target" "$$file"; then \
+					echo "WARNING: Target '$$target' in $$file not declared as .PHONY"; \
+				fi; \
+			done; \
+		fi; \
+	done
+	@echo "✓ .PHONY declarations verified"
+.PHONY: verify-phony-declarations
+
+# Verify that no duplicate targets exist across makefiles
+verify-no-duplicates: verify-makefiles-readable ## Verify no duplicate targets
+	@targets=""; \
+	for file in $(MAKEFILES); do \
+		if [ -f "$$file" ]; then \
+			targets="$$targets $$(grep '^[a-zA-Z0-9_-]*:' $$file | cut -d: -f1)"; \
+		fi; \
+	done; \
+	duplicates=$$(printf '%s\n' $$targets | sort | uniq -d); \
+	if [ -n "$$duplicates" ]; then \
+		echo "ERROR: Duplicate targets found: $$duplicates"; \
+		exit 1; \
+	fi
+	@echo "✓ No duplicate targets across makefiles"
+.PHONY: verify-no-duplicates
+
+# Test that all targets from modular makefiles are accessible
+verify-targets-accessible: verify-main-includes ## Verify targets are accessible from root
+	@echo "Testing uv targets..."; \
+	make -n install >/dev/null || exit 1; \
+	make -n install-dev >/dev/null || exit 1; \
+	make -n upgrade >/dev/null || exit 1; \
+	echo "✓ UV targets accessible"; \
+	echo "Testing docker targets..."; \
+	make -n up >/dev/null || exit 1; \
+	make -n down >/dev/null || exit 1; \
+	make -n bash >/dev/null || exit 1; \
+	echo "✓ Docker targets accessible"; \
+	echo "Testing python targets..."; \
+	make -n typecheck >/dev/null || exit 1; \
+	make -n test-python >/dev/null || exit 1; \
+	echo "✓ Python targets accessible"
+.PHONY: verify-targets-accessible
+
+# List all available targets with their help text
+list-targets: ## List all available make targets
+	@echo "Available targets:"; \
+	echo ""; \
+	grep -h "##" Makefile $(MAKEFILES) 2>/dev/null | \
+		grep -E "^[a-zA-Z0-9_-]+:" | \
+		sed 's/:.*##\s*/:/' | \
+		sed 's/:/ /'
+.PHONY: list-targets
+
+# Run all verification checks
+verify-all: verify-makefiles-exist verify-makefiles-readable verify-main-includes verify-phony-declarations verify-no-duplicates verify-targets-accessible ## Run all makefile verification checks
+	@echo ""; \
+	echo "╔════════════════════════════════════════╗"; \
+	echo "║  All makefile verifications passed! ✓  ║"; \
+	echo "╚════════════════════════════════════════╝"
+.PHONY: verify-all

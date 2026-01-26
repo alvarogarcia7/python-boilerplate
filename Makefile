@@ -3,6 +3,7 @@ include makefiles/uv.mk
 include makefiles/python.mk
 include makefiles/docker.mk
 include makefiles/bash-colors.mk
+include makefiles/meta.mk
 
 install-githooks: check-uv ## Install git hooks
 	uv run pre-commit install
