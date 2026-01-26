@@ -2,6 +2,7 @@
 include makefiles/uv.mk
 include makefiles/python.mk
 include makefiles/docker.mk
+include makefiles/ruff.mk
 include makefiles/bash-colors.mk
 include makefiles/meta.mk
 
