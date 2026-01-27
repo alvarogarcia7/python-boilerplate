@@ -10,3 +10,9 @@ test: check-uv typecheck test-python ## Execute all tests
 
 pre-commit: test ## Git hook for pre-commit
 .PHONY: pre-commit
+
+init: ## Initialize this project in this folder (or git worktree) after clone
+	${MAKE} install-dev
+	${MAKE} install-githooks
+	${MAKE} test
+.PHONY: init

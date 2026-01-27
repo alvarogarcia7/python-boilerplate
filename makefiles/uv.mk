@@ -11,18 +11,19 @@ sync: check-uv
 	uv sync
 .PHONY: sync
 
-# Install only production dependencies (no dev deps)
-install: check-uv
+install: check-uv ## Install only production dependencies (no dev deps)
 	uv sync --no-dev
 .PHONY: install
 
-# Upgrade all dependencies
-upgrade: check-uv
+install-dev: check-uv ## Install production and dev dependencies
+	uv sync
+.PHONY: install-dev
+
+upgrade: check-uv ## Upgrade all dependencies
 	uv sync --upgrade
 .PHONY: upgrade
 
-# Typecheck with mypy using uv run
-typecheck: check-uv
+typecheck: check-uv ## Typecheck with mypy
 	uv run mypy . --exclude .venv --strict --warn-unreachable --warn-return-any --disallow-untyped-calls
 .PHONY: typecheck
 
