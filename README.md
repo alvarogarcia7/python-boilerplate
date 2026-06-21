@@ -23,3 +23,16 @@ make bash
 # development
 make down
 ```
+
+## Testing
+
+Run the full suite (type checks, example-based tests and property-based tests):
+
+```bash
+make test
+```
+
+This project also uses [Hypothesis](https://hypothesis.readthedocs.io) for
+property-based testing. See [docs/property-testing.md](docs/property-testing.md)
+for what is covered, how to run it (`make test-hypothesis`,
+`make hypothesis-stats`) and how to add new properties.

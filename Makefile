@@ -5,12 +5,13 @@ include makefiles/docker.mk
 include makefiles/ruff.mk
 include makefiles/bash-colors.mk
 include makefiles/meta.mk
+include makefiles/hypothesis.mk
 
 install-githooks: check-uv ## Install git hooks
 	uv run pre-commit install
 .PHONY: install-githooks
 
-test: check-uv typecheck test-python ## Execute all tests
+test: check-uv typecheck test-python test-hypothesis ## Execute all tests
 .PHONY: test
 
 pre-commit: ## Git hook for pre-commit
